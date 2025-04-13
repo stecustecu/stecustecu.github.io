@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="theme-color" content="#000000" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/transcript.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>DEVELOPMENT OF CBT CBT TEST 2023</title>
+  <link rel="icon" type="image/x-icon" href="img/17.webp">
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* CSS untuk footer dan konten lainnya */
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: black;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      font-size: 14px;
+      z-index: 1000;
+    }
+  
+    .footer-left button {
+      margin-right: 5px;
+      padding: 8px;
+      background: white;
+      color: black;
+      border: none;
+      border-radius: 5px;
+    }
+  
+    .logout-btn {
+      border: 1px solid red;
+      color: red;
+      background: transparent;
+    }
+  
+    /* Info footer kanan: tampil dua baris untuk jam & baterai */
+    .footer-right {
+      border: 1px solid white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-align: right;
+      display: flex;
+      line-height: 1.2;
+    }
+  
+    .footer-right > div {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    /* Style untuk overlay loading */
+    #bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: #000;
+      opacity: 0.5;
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #fff;
+    }
+  </style>  
+</head>
+<body class="bg-gradient-to-br from-blue-800 to-gray-900 text-white min-h-screen">
+
+  <!-- Overlay loading (jika diperlukan) -->
+  <!--<div id="bg">Loading...</div>-->
+
+  <!-- Container scrollable dengan scroll-snap -->
+  <div class="scroll-container">
+    <!-- Section 1: Exam Form -->
+    <section class="snap-section flex flex-col items-center justify-center px-6">
+      <h1 class="text-3xl font-bold mb-4">Exam</h1>
+      <form id="askurl" class="mt-4 w-full max-w-md">
+        <label for="url" class="block text-lg font-semibold mb-2">Insert Exam URL</label>
+        <div class="relative flex items-stretch gap-2">
+          <input
+            type="text"
+            id="url"
+            class="flex-1 p-3 border rounded bg-gray-700 focus:outline-none focus:shadow-outline-blue"
+            placeholder="URL CBT"
+          />
+          <button
+            type="button"
+            id="submit"
+            class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue active:bg-blue-800 transition duration-300 ease-in-out"
+          >
+            Run
+          </button>
+          <button
+            type="button"
+            id="fullscreen"
+            class="bg-gray-600 text-white p-3 rounded hover:bg-gray-700 focus:outline-none transition duration-300 ease-in-out flex items-center"
+          >
+            <span class="material-icons text-lg">fullscreen</span>
+          </button>
+        </div>
+      </form>
+      <div id="content"></div>
+    </section>
+
+    <!-- Section 2: Iframe Container -->
+    <section class="snap-section" id="iframe-section">
+      <div id="iframe-container" style="min-height: 80vh;">
+        <!-- Iframe atau konten lain dapat diletakkan di sini -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer Tetap -->
+  <footer class="px-4 py-1 md:px-8 md:py-2 flex flex-row items-center justify-between">
+    <div class="flex gap-2">
+      <button class="min-w-[4.5rem] px-3 py-3 border border-red-500 text-red-500 text-[10px] rounded">
+        Exit
+      </button>
+    </div>
+    <div class="flex gap-2">
+      <button class="w-10 h-10 flex items-center justify-center bg-[#c2c2c2] text-black rounded">
+        <span class="material-icons text-base">home</span>
+      </button>
+      <button class="w-10 h-10 flex items-center justify-center bg-[#c2c2c2] text-black rounded">
+        <span class="material-icons text-base">arrow_back</span>
+      </button>
+      <button class="w-10 h-10 flex items-center justify-center bg-[#c2c2c2] text-black rounded">
+        <span class="material-icons text-base">refresh</span>
+      </button>
+      <button class="w-10 h-10 flex items-center justify-center bg-[#c2c2c2] text-black rounded">
+        <span class="material-icons text-base">arrow_forward</span>
+      </button>
+    </div>
+    <div class="border border-white w-[5rem] rounded md:mr-2">
+      <div class="flex items-center justify-center p-1 gap-1">
+        <span class="material-icons text-base">signal_cellular_alt</span>
+        <span id="clock" class="text-[10px]">1.630 AM</span>
+      </div>
+      <hr class="mx-1" />
+      <div class="flex items-center justify-center p-1 gap-1">
+        <span class="material-icons text-sm">battery_full</span>
+        <span id="battery" class="text-xs">83%</span>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Script untuk sweetalert (jika digunakan) dan index.js -->
+  <script src="js/index.js"></script>
+
+  <!-- Script untuk update jam -->
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const hour = now.getHours().toString().padStart(2, "0");
+      const min = now.getMinutes().toString().padStart(2, "0");
+      document.getElementById("clock").textContent = `${hour}:${min}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+  
+  <!-- Script untuk simulasi update baterai -->
+  <script>
+    navigator.getBattery().then(function(battery) {
+      function updateBatteryLevel() {
+        // Battery level is a value between 0.0 and 1.0
+        const level = Math.floor(battery.level * 100);
+        document.getElementById("battery").textContent = level + "%";
+      }
+
+      updateBatteryLevel();
+
+      // Listen for battery level changes
+      battery.addEventListener("levelchange", updateBatteryLevel);
+    });
+  </script>
+
+  <script>
+    // Mendapatkan tombol fullscreen berdasarkan id
+    const fsBtn = document.getElementById('fullscreen');
+    
+    // Menambahkan event listener untuk menangani klik pada tombol fullscreen
+    fsBtn.addEventListener('click', () => {
+      // Cek apakah tidak ada elemen yang sedang dalam mode layar penuh
+      if (!document.fullscreenElement) {
+        // Meminta mode fullscreen untuk elemen root dokumen, bisa disesuaikan misalnya dengan container tertentu
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Error mengaktifkan mode fullscreen: ${err.message}`);
+        });
+      } else {
+        // Jika sudah berada di mode fullscreen, keluar dari mode fullscreen
+        document.exitFullscreen();
+      }
+    });
+  </script>
+  
+  <!-- Script untuk full screen toggle (sesuai kode Anda sebelumnya) -->
+  <script>
+    const toggleFullScreen = document.getElementById('fullScreenToggle');
+    const bottomLeftIcon = document.getElementById('bottomLeftIcon');
+
+    if (toggleFullScreen) {
+      toggleFullScreen.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          exitFullScreen();
+        } else {
+          enterFullScreen();
+        }
+      });
+    }
+
+    if (bottomLeftIcon) {
+      bottomLeftIcon.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          exitFullScreen();
+        } else {
+          enterFullScreen();
+        }
+      });
+    }
+
+    function enterFullScreen() {
+      const element = document.documentElement;
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen();
+      } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+      }
+    }
+
+    function exitFullScreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+  </script>
+
+  <script>
+  // Pastikan browser mendukung API ini
+  if (screen.orientation && screen.orientation.lock) {
+    // Fungsi untuk mencoba mengunci orientasi ke mode potrait
+    function lockOrientation() {
+      screen.orientation.lock('portrait').then(function() {
+        console.log('Orientasi terkunci pada mode potrait.');
+      }).catch(function(error) {
+        console.log('Gagal mengunci orientasi: ', error);
+      });
+    }
+
+    // Contoh: panggil fungsi ini ketika user mengaktifkan mode fullscreen
+    document.addEventListener('click', function() {
+      // Misal, minta fullscreen terlebih dahulu
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(lockOrientation);
+      } else {
+        lockOrientation();
+      }
+    });
+  } else {
+    console.log('Screen Orientation API tidak didukung oleh browser ini.');
+  }
+</script>
+  
+</body>
+</html>
